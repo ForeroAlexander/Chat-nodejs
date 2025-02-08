@@ -40,3 +40,34 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Ignorar node_modules
+node_modules/
+
+# Ignorar archivos de entorno
+.env
+.env.local
+
+# Ignorar carpetas de compilación
+dist/
+build/
+
+# Ignorar logs
+logs/
+*.log
+
+# Ignorar configuraciones del IDE
+.vscode/
+.idea/
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar dependencias de Angular
+.cache/
+.angular/
+
+# Ignorar archivos de npm/yarn
+package-lock.json
+yarn.lock

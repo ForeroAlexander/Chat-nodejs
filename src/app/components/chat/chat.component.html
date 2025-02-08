@@ -1,0 +1,101 @@
+<div class="chat-container" [ngClass]="{'dark-theme': isDarkTheme}">
+  <mat-toolbar>
+    <mat-icon>chat</mat-icon>
+    <span class="toolbar-title">Chat Moderno</span>
+    <span class="toolbar-spacer"></span>
+    
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="toggleTheme()">
+        <mat-icon>{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span>{{ isDarkTheme ? 'Tema Claro' : 'Tema Oscuro' }}</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <div class="messages-container" #scrollContainer>
+    <div *ngFor="let message of messages" 
+         [@messageAnimation]="message.state" 
+         class="message" 
+         [ngClass]="{
+           'text-message': message.type === 'text',
+           'image-message': message.type === 'image',
+           'gif-message': message.type === 'gif',
+           'sent': message.sender_id === currentUser.id,
+           'received': message.sender_id !== currentUser.id
+         }">
+      <div class="message-header">
+        <span class="sender-name">{{ message.sender_name }}</span>
+        <span class="message-time">{{ message.created_at | date:'shortTime' }}</span>
+      </div>
+      
+      <div [ngSwitch]="message.type">
+        <div *ngSwitchCase="'text'" class="text-content">
+          {{ message.content }}
+        </div>
+        <div *ngSwitchCase="'image'" class="image-content">
+          <img [src]="'data:image/jpeg;base64,' + message.content" 
+               alt="Imagen enviada"
+               loading="lazy">
+        </div>
+        <div *ngSwitchCase="'gif'" class="gif-content">
+          <img [src]="message.content" 
+               alt="GIF"
+               loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="typingUsers.length > 0" class="typing-indicator">
+      {{ typingUsers[0].name }} está escribiendo...
+      <span *ngIf="typingUsers.length > 1">
+        y {{ typingUsers.length - 1 }} más
+      </span>
+    </div>
+  </div>
+
+  <div class="input-container">
+
+    <mat-form-field appearance="outline" class="message-input">
+      <mat-label>Escribe un mensaje...</mat-label>
+      <input matInput 
+             #messageInput
+             [(ngModel)]="newMessage" 
+             placeholder="Escribe un mensaje..." 
+             (keyup.enter)="sendMessage()"
+             (input)="onInput()"
+             [disabled]="uploading">
+      <mat-icon matSuffix>message</mat-icon>
+    </mat-form-field>
+    
+    <button mat-fab 
+            color="primary" 
+            (click)="sendMessage()"
+            [disabled]="!newMessage.trim() || uploading">
+      <mat-icon>send</mat-icon>
+    </button>
+    
+    <input type="file" 
+           #fileInput
+           id="fileInput" 
+           (change)="onFileSelected($event)" 
+           accept="image/*" 
+           style="display: none;">
+           
+    <button mat-fab 
+            color="accent"
+            (click)="triggerFileInput()"
+            [disabled]="uploading">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+  </div>
+
+  <mat-progress-bar *ngIf="uploading" 
+                   mode="determinate" 
+                   [value]="uploadProgress"
+                   color="accent">
+  </mat-progress-bar>
+</div>
